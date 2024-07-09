@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Соло на клавиатуре</title>
+    <link rel="stylesheet" href="task.css">
+    <!-- <link rel="stylesheet" href="../../assets/css/style.css"> -->
+</head>
+<!-- ПЕРЕНЕСЁМ СТИЛИ В HTML (для удобства) -->
+<style>
+    .symbol {
+  font-size: 50px;
+}
+
+.symbol_correct {
+  color: green;
+}
+
+.word_incorrect {
+  background: red;
+  color: #fff;
+}
+
+</style>
+<body>
+    <header class="header">
+        <div class="logo__container">
+          <a href="https://netology.ru/" class="logo__link"></a>
+        </div>
+        <h1 class="header__title">
+            Домашнее задание к занятию 1.3 «Объект события». Соло на клавиатуре.
+        </h1>
+    </header>
+ 
+    <main class="content">
+        <div class="card">
+            <div id="game">
+                <div class="status">
+                    <p>
+                        Правильно введённых слов: <span class="status__wins">0</span>
+                    </p>
+                    <p>
+                        Неправильно введённых слов: <span class="status__loss">0</span>
+                    </p>
+                </div>
+                <div class="word">
+                    <span class="symbol symbol_current">К</span>
+                    <span class="symbol">о</span>
+                    <span class="symbol">л</span>
+                    <span class="symbol">я</span>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- <script src="task.js"></script> -->
+
+    <script>
+
+        class Game {
+        constructor(container) {
+            // console.log(container);
+            this.container = container;
+            console.log(this.container);
+            this.wordElement = container.querySelector('.word'); // "word"-"слово"
+            console.log(this.wordElement);
+            this.winsElement = container.querySelector('.status__wins'); // "wins"-"побеждать"
+            console.log(this.winsElement);
+            this.lossElement = container.querySelector('.status__loss');// "loss"-"проигрыш"
+            console.log(this.lossElement);
+
+            this.reset();
+
+            this.registerEvents();
+        }
+
+        reset() {
+            this.setNewWord();
+            this.winsElement.textContent = 0;
+            this.lossElement.textContent = 0;
+        }
+
+        // Функция-обработчик события - нажатие клавиши клавиатуры
+            // onKey(e) {
+            //     console.log(e.key)
+            // }
+
+        registerEvents() {
+            /*
+            TODO:
+            Написать обработчик события, который откликается
+            на каждый введённый символ.
+            В случае правильного ввода символа вызываем this.success()
+            При неправильном вводе символа - this.fail();
+            DOM-элемент текущего символа находится в свойстве this.currentSymbol.
+            */
+
+        //    Задаём область написания букв c клавиатуры - всё пространство страницы (тег body)
+            const text = document.querySelector('body');
+
+        // Определяем текущую букву проверяемого слова
+            // let currentSymbolText = this.currentSymbol.textContent;
+
+            // обработчик ввода буквы с клавиатуры:
+            text.onkeydown = (e)=> {
+                console.log(e.key);
+
+                let currentSymbolText = this.currentSymbol.textContent;
+
+                // // Если вводимый с клавиатуры символ совпадает с текущей буквой слова
+                // if(e.key.toLowerCase()== currentSymbolText.toLowerCase()) {
+                //     // вызываам метод this.success()
+                //     console.log("Совпадение");
+                //     this.success()
+                // } else {
+                //     // Иначе , вызываем метод fail()
+                //     console.log("Промах");
+                //     this.fail()
+                // }
+
+                // if (this.currentSymbol.textContent === e.key) {
+                // if ( e.key.toLowerCase() == this.currentSymbol.textContent.toLowerCase()) {  
+                if ( e.key == currentSymbolText) {  
+                    this.success();
+                     } else {
+                     this.fail();
+                 }
+
+
+            };
+
+
+
+        }
+
+        success() {
+            if(this.currentSymbol.classList.contains("symbol_current")) this.currentSymbol.classList.remove("symbol_current");
+            this.currentSymbol.classList.add('symbol_correct');
+            this.currentSymbol = this.currentSymbol.nextElementSibling;
+
+            if (this.currentSymbol !== null) {
+            this.currentSymbol.classList.add('symbol_current');
+            return;
+            }
+
+            if (++this.winsElement.textContent === 10) {
+            alert('Победа!');
+            this.reset();
+            }
+            this.setNewWord();
+        }
+
+        fail() {
+            if (++this.lossElement.textContent === 5) {
+            alert('Вы проиграли!');
+            this.reset();
+            }
+            this.setNewWord();
+        }
+
+        setNewWord() {
+            const word = this.getWord();
+
+            this.renderWord(word);
+        }
+
+        getWord() {
+            const words = [
+                'bob',
+                'awesome',
+                'netology',
+                'hello',
+                'kitty',
+                'rock',
+                'youtube',
+                'popcorn',
+                'cinema',
+                'love',
+                'javascript'
+            ],
+            index = Math.floor(Math.random() * words.length);
+
+            return words[index];
+        }
+
+        // создаём элемент с классом .word и находим текущий символ в слове
+        renderWord(word) {
+            const html = [...word]
+            
+            .map(
+                (s, i) =>
+                `<span class="symbol ${i === 0 ? 'symbol_current': ''}">${s}</span>`
+            )
+            .join('');
+            console.log(html);
+
+            // создаём элемент с классом .word :
+            this.wordElement.innerHTML = html;
+            // console.log(this.wordElement.innerHTML)
+
+            // сохранили текущий символ ( span c классом 'symbol_current')
+            this.currentSymbol = this.wordElement.querySelector('.symbol_current');
+            console.log(this.currentSymbol) // <span class="symbol symbol_current">h</span>
+            console.log(this.currentSymbol.textContent)
+        }   
+}
+
+new Game(document.getElementById('game'))
+
+
+    </script>
+</body>
+</html>
+
+
+
+<!-- // container:
+
+<div id="game">
+    <div class="status">
+        <p>
+            Правильно введённых слов: <span class="status__wins">0</span>
+        </p>
+        <p>
+            Неправильно введённых слов: <span class="status__loss">0</span>
+        </p>
+    </div>
+    <div class="word">
+        <span class="symbol symbol_current">К</span>
+        <span class="symbol">о</span>
+        <span class="symbol">л</span>
+        <span class="symbol">я</span>
+    </div>
+</div> -->
